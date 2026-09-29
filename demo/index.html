@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>svg-part-picker demo</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#f1f5f9, #020617);
+      --card: light-dark(#ffffff, #0f172a);
+      --border: light-dark(#e2e8f0, #1e293b);
+      --text: light-dark(#0f172a, #e2e8f0);
+      --muted: light-dark(#64748b, #94a3b8);
+      --accent: #2563eb;
+    }
+    :root[data-theme="light"] { color-scheme: light; }
+    :root[data-theme="dark"] { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 40px 16px 64px; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+    h1 code { font: inherit; }
+    header p { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; }
+    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+    svg-part-picker { height: 480px; --spp-accent: var(--accent); }
+    @media (max-width: 600px) { svg-part-picker { height: 380px; } }
+    svg-part-picker:not(:defined) { visibility: hidden; }
+    .panel { display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .card h2 { margin: 0 0 10px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 6px 3px 10px; border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      color: var(--text); font-size: 13px;
+    }
+    .chip button {
+      all: unset; cursor: pointer; width: 18px; height: 18px; border-radius: 50%;
+      display: grid; place-items: center; color: var(--muted);
+    }
+    .chip button:hover { background: color-mix(in srgb, var(--accent) 25%, transparent); color: var(--text); }
+    .placeholder { color: var(--muted); font-size: 13px; }
+    .hover { font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 20px; }
+    label.opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; font-size: 14px; }
+    select, .btn {
+      font: inherit; font-size: 13px; color: var(--text); background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px;
+    }
+    .btn { cursor: pointer; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    ol.log {
+      list-style: none; margin: 0; padding: 0; max-height: 180px; overflow: auto;
+      font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted);
+    }
+    ol.log li b { color: var(--text); font-weight: 600; }
+    pre {
+      margin: 20px 0 0; padding: 16px; overflow: auto; border-radius: 14px;
+      background: var(--card); border: 1px solid var(--border);
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .hint { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
+    kbd { font: 12px ui-monospace, monospace; padding: 1px 5px; border: 1px solid var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1><code>&lt;svg-part-picker&gt;</code></h1>
+      <p>A dependency-free Web Component for selecting parts on a multi-view SVG schematic. Click parts to select them, scroll or pinch to zoom, drag to pan.</p>
+    </div>
+    <label class="opt">Theme
+      <select id="theme">
+        <option value="">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+  </header>
+
+  <div class="layout">
+    <div>
+      <svg-part-picker id="picker" name="parts" selected="hood left-front-door" max-zoom="6">
+        <!-- Side view: the car faces left, so we see its left flank. -->
+        <svg data-view="side" data-label="Side" viewBox="0 0 640 280">
+          <ellipse cx="325" cy="246" rx="290" ry="10" fill="currentColor" opacity="0.18" pointer-events="none" />
+          <path data-part="front-bumper" data-label="Front bumper" d="M40 142 L72 134 L72 200 L50 200 Q40 200 40 190 Z" />
+          <path data-part="left-front-fender" data-label="Left front fender" d="M72 134 L214 128 L230 132 L230 200 L196 200 A46 46 0 0 0 104 200 L72 200 Z" />
+          <path data-part="windshield" data-label="Windshield" d="M216 126 L282 72 L296 72 L234 126 Z" />
+          <path data-part="roof" data-label="Roof" d="M282 70 L296 58 L440 58 L454 70 Z" />
+          <path data-part="left-front-window" data-label="Left front window" d="M242 126 L300 76 L366 76 L366 126 Z" />
+          <path data-part="left-rear-window" data-label="Left rear window" d="M374 76 L440 76 L480 126 L374 126 Z" />
+          <path data-part="rear-window" data-label="Rear window" d="M452 72 L466 72 L522 124 L504 126 Z" />
+          <path data-part="left-mirror" data-label="Left mirror" d="M226 126 L240 110 L256 112 L252 126 Z" />
+          <path data-part="left-front-door" data-label="Left front door" d="M234 132 L370 132 L370 200 L234 200 Z" />
+          <path data-part="left-rear-door" data-label="Left rear door" d="M374 132 L474 132 L454 200 L374 200 Z" />
+          <path data-part="left-rear-quarter" data-label="Left rear quarter panel" d="M478 132 L508 128 L590 134 L590 200 L546 200 A46 46 0 0 0 454 200 Z" />
+          <path data-part="rear-bumper" data-label="Rear bumper" d="M590 134 L602 136 Q610 140 610 150 L610 192 Q610 200 600 200 L590 200 Z" />
+          <circle data-part="left-front-wheel" data-label="Left front wheel" cx="150" cy="206" r="36" />
+          <circle data-part="left-rear-wheel" data-label="Left rear wheel" cx="500" cy="206" r="36" />
+          <g fill="none" stroke="currentColor" stroke-width="1.5" pointer-events="none">
+            <circle cx="150" cy="206" r="17" /><circle cx="500" cy="206" r="17" />
+            <path d="M338 146 h18 M440 146 h18" stroke-linecap="round" stroke-width="3" />
+          </g>
+        </svg>
+
+        <!-- Front view: the car faces the viewer, so its left side is on our right. -->
+        <svg data-view="front" data-label="Front" viewBox="0 0 480 290">
+          <ellipse cx="240" cy="272" rx="190" ry="9" fill="currentColor" opacity="0.18" pointer-events="none" />
+          <rect data-part="right-front-wheel" data-label="Right front wheel" x="86" y="226" width="48" height="44" rx="9" />
+          <rect data-part="left-front-wheel" data-label="Left front wheel" x="346" y="226" width="48" height="44" rx="9" />
+          <path data-part="roof" data-label="Roof" d="M168 50 L312 50 L320 64 L160 64 Z" />
+          <path data-part="windshield" data-label="Windshield" d="M160 68 L320 68 L352 132 L128 132 Z" />
+          <path data-part="hood" data-label="Hood" d="M126 136 L354 136 L394 162 L86 162 Z" />
+          <path data-part="right-mirror" data-label="Right mirror" d="M92 112 L124 116 L124 132 L94 130 Z" />
+          <path data-part="left-mirror" data-label="Left mirror" d="M388 112 L356 116 L356 132 L386 130 Z" />
+          <path data-part="right-headlight" data-label="Right headlight" d="M82 168 L150 168 L146 190 L78 186 Z" />
+          <path data-part="left-headlight" data-label="Left headlight" d="M330 168 L398 168 L402 186 L334 190 Z" />
+          <path data-part="grille" data-label="Grille" d="M160 168 L320 168 L312 198 L168 198 Z" />
+          <path data-part="front-bumper" data-label="Front bumper" d="M72 192 L164 204 L316 204 L408 192 L412 222 Q412 232 400 232 L80 232 Q68 232 68 222 Z" />
+          <g fill="none" stroke="currentColor" stroke-width="1.5" pointer-events="none" stroke-linecap="round">
+            <path d="M180 178 h120 M176 188 h128" opacity="0.7" />
+            <rect x="200" y="210" width="80" height="16" rx="3" />
+          </g>
+        </svg>
+
+        <!-- Top view: the front points left, so the car's left side is at the bottom. -->
+        <svg data-view="top" data-label="Top" viewBox="0 0 650 300">
+          <rect x="40" y="58" width="572" height="184" rx="44" fill="currentColor" opacity="0.1" pointer-events="none" />
+          <path data-part="front-bumper" data-label="Front bumper" d="M44 112 Q46 78 70 70 L74 70 L74 230 L70 230 Q46 222 44 188 Z" />
+          <path data-part="hood" data-label="Hood" d="M78 74 L220 70 L220 230 L78 226 Z" />
+          <path data-part="windshield" data-label="Windshield" d="M224 72 L284 80 L284 220 L224 228 Z" />
+          <path data-part="roof" data-label="Roof" d="M288 80 L436 80 L436 220 L288 220 Z" />
+          <path data-part="rear-window" data-label="Rear window" d="M440 82 L492 90 L492 210 L440 218 Z" />
+          <path data-part="trunk" data-label="Trunk lid" d="M496 76 L580 80 L580 220 L496 224 Z" />
+          <path data-part="rear-bumper" data-label="Rear bumper" d="M584 78 L592 78 Q608 92 608 112 L608 188 Q608 208 592 222 L584 222 Z" />
+          <path data-part="right-mirror" data-label="Right mirror" d="M236 66 L254 66 L258 46 L240 46 Z" />
+          <path data-part="left-mirror" data-label="Left mirror" d="M236 234 L254 234 L258 254 L240 254 Z" />
+          <path data-part="right-front-door" data-label="Right front door" d="M290 64 L362 64 L362 77 L290 77 Z" />
+          <path data-part="right-rear-door" data-label="Right rear door" d="M366 64 L436 64 L436 77 L366 77 Z" />
+          <path data-part="left-front-door" data-label="Left front door" d="M290 223 L362 223 L362 236 L290 236 Z" />
+          <path data-part="left-rear-door" data-label="Left rear door" d="M366 223 L436 223 L436 236 L366 236 Z" />
+        </svg>
+      </svg-part-picker>
+      <p class="hint">
+        Keyboard: <kbd>Tab</kbd> to a part, <kbd>Space</kbd> to toggle, <kbd>+</kbd> / <kbd>-</kbd> to zoom,
+        <kbd>0</kbd> to reset, <kbd>Shift</kbd> + arrows to pan. Parts shared between views stay in sync.
+      </p>
+    </div>
+
+    <aside class="panel">
+      <section class="card">
+        <h2>Selected</h2>
+        <div class="chips" id="chips"></div>
+        <div class="hover" id="hover"></div>
+      </section>
+      <section class="card">
+        <h2>Options</h2>
+        <label class="opt">Selection mode
+          <select id="mode">
+            <option value="multiple">Multiple</option>
+            <option value="single">Single</option>
+          </select>
+        </label>
+        <label class="opt">Only neighbouring parts <input type="checkbox" id="adjacent" /></label>
+        <label class="opt">Lock the wheels <input type="checkbox" id="lock-wheels" /></label>
+        <label class="opt">Disabled <input type="checkbox" id="disabled" /></label>
+        <label class="opt">Hide zoom controls <input type="checkbox" id="no-controls" /></label>
+        <label class="opt">
+          <button class="btn" id="clear" type="button">Clear selection</button>
+        </label>
+      </section>
+      <section class="card">
+        <h2>Events</h2>
+        <ol class="log" id="log" reversed></ol>
+      </section>
+    </aside>
+  </div>
+
+  <pre><code id="snippet"></code></pre>
+</main>
+
+<script type="module">
+  import '../src/index.ts';
+
+  const picker = document.getElementById('picker');
+  const chips = document.getElementById('chips');
+  const hover = document.getElementById('hover');
+  const log = document.getElementById('log');
+
+  // Which parts touch each other, used by the "Only neighbouring parts" option.
+  const adjacency = {
+    'front-bumper': ['hood', 'grille', 'left-headlight', 'right-headlight', 'left-front-fender'],
+    hood: ['windshield', 'grille', 'left-headlight', 'right-headlight', 'left-front-fender'],
+    windshield: ['roof', 'left-mirror', 'right-mirror', 'left-front-window'],
+    roof: ['rear-window', 'left-front-window', 'left-rear-window', 'left-front-door', 'left-rear-door', 'right-front-door', 'right-rear-door'],
+    'rear-window': ['trunk', 'left-rear-quarter'],
+    trunk: ['rear-bumper', 'left-rear-quarter'],
+    'left-front-fender': ['left-front-door', 'left-front-wheel', 'left-mirror'],
+    'left-front-door': ['left-rear-door', 'left-front-window', 'left-mirror'],
+    'left-rear-door': ['left-rear-quarter', 'left-rear-window'],
+    'left-rear-quarter': ['left-rear-wheel', 'rear-bumper'],
+    'right-front-door': ['right-rear-door', 'right-mirror'],
+  };
+
+  const labelOf = (id) => picker.parts.find((p) => p.id === id)?.label ?? id;
+
+  function renderChips() {
+    chips.replaceChildren();
+    if (picker.selected.length === 0) {
+      chips.innerHTML = '<span class="placeholder">Nothing selected yet</span>';
+      return;
+    }
+    for (const id of picker.selected) {
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = labelOf(id);
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.setAttribute('aria-label', `Remove ${labelOf(id)}`);
+      remove.textContent = '×';
+      remove.onclick = () => { picker.deselect(id); renderChips(); };
+      chip.append(remove);
+      chips.append(chip);
+    }
+  }
+
+  function addLog(type, detail) {
+    const li = document.createElement('li');
+    li.innerHTML = `<b>${type}</b> ${JSON.stringify(detail)}`;
+    log.prepend(li);
+    while (log.children.length > 40) log.lastChild.remove();
+  }
+
+  picker.addEventListener('selection-change', (e) => {
+    renderChips();
+    addLog('selection-change', { added: e.detail.added, removed: e.detail.removed });
+  });
+  picker.addEventListener('view-change', (e) => addLog('view-change', e.detail));
+  picker.addEventListener('zoom-change', (e) => addLog('zoom-change', { view: e.detail.view, zoom: +e.detail.zoom.toFixed(2) }));
+  picker.addEventListener('part-hover', (e) => {
+    hover.textContent = e.detail.part ? `Pointing at: ${labelOf(e.detail.part)}` : '';
+  });
+
+  document.getElementById('mode').onchange = (e) => { picker.selectionMode = e.target.value; renderChips(); };
+  document.getElementById('adjacent').onchange = (e) => { picker.adjacency = e.target.checked ? adjacency : null; };
+  document.getElementById('lock-wheels').onchange = (e) => {
+    picker.disabledParts = e.target.checked
+      ? ['left-front-wheel', 'left-rear-wheel', 'right-front-wheel']
+      : [];
+  };
+  document.getElementById('disabled').onchange = (e) => { picker.disabled = e.target.checked; };
+  document.getElementById('no-controls').onchange = (e) => picker.toggleAttribute('no-controls', e.target.checked);
+  document.getElementById('clear').onclick = () => { picker.clear(); renderChips(); };
+  document.getElementById('theme').onchange = (e) => {
+    if (e.target.value) document.documentElement.dataset.theme = e.target.value;
+    else delete document.documentElement.dataset.theme;
+  };
+
+  document.getElementById('snippet').textContent = `<svg-part-picker selected="hood" max-zoom="6">
+  <svg data-view="side" viewBox="0 0 640 280">
+    <path data-part="hood" data-label="Hood" d="..." />
+    <circle data-part="left-front-wheel" cx="150" cy="206" r="36" />
+  </svg>
+  <svg data-view="top" viewBox="0 0 650 300">...</svg>
+</svg-part-picker>
+
+picker.addEventListener('selection-change', (e) => {
+  console.log(e.detail.selected, e.detail.added, e.detail.removed);
+});`;
+
+  customElements.whenDefined('svg-part-picker').then(renderChips);
+</script>
+</body>
+</html>

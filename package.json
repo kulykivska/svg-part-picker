@@ -1,0 +1,58 @@
+{
+  "name": "svg-part-picker",
+  "version": "0.1.0",
+  "description": "A framework-agnostic Web Component for picking parts on a multi-view SVG schematic, with zoom, pan and selection events.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./element": {
+      "types": "./dist/svg-part-picker.d.ts",
+      "import": "./dist/svg-part-picker.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.js"
+  ],
+  "scripts": {
+    "dev": "vite --open /demo/",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "web-component",
+    "custom-element",
+    "svg",
+    "schematic",
+    "diagram",
+    "part-picker",
+    "zoom",
+    "pan"
+  ],
+  "author": "Yuliia Kulykivska",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kulykivska/svg-part-picker.git"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "~4.0.0"
+  }
+}
