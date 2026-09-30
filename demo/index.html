@@ -241,7 +241,9 @@
 
   function addLog(type, detail) {
     const li = document.createElement('li');
-    li.innerHTML = `<b>${type}</b> ${JSON.stringify(detail)}`;
+    const b = document.createElement('b');
+    b.textContent = type;
+    li.append(b, ` ${JSON.stringify(detail)}`);
     log.prepend(li);
     while (log.children.length > 40) log.lastChild.remove();
   }
